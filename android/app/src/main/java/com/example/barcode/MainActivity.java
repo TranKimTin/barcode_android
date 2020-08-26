@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -25,7 +26,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button buttonScan;
+    private Button buttonScan, btnTestFirebase;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     //qr code scanner object
     private IntentIntegrator qrScan;
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //View objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
+        btnTestFirebase = (Button) findViewById(R.id.btnTestFirebase);
+
         //intializing scan object
         qrScan = new IntentIntegrator(this);
         qrScan.setDesiredBarcodeFormats(IntentIntegrator.CODE_128);
@@ -45,13 +49,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qrScan.setCaptureActivity(CaptureActivityPortrait.class);
 
         //attaching onclick listener
-        buttonScan.setOnClickListener((View.OnClickListener) this);
+        buttonScan.setOnClickListener(this);
+
+        btnTestFirebase.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-    //initiating the qr code scan
-        qrScan.initiateScan();
+        switch (view.getId()){
+            case R.id.buttonScan:
+                //initiating the qr code scan
+                qrScan.initiateScan();
+                break;
+            case R.id.btnTestFirebase:
+
+                break;
+        }
+
     }
 
     //Getting the scan results
