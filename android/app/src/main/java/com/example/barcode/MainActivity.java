@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 qrScan.initiateScan();
                 break;
             case R.id.btnQuanLyThongTin:
-
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 break;
         }
 
