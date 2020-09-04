@@ -26,7 +26,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button buttonScan, btnTestFirebase;
+    private Button buttonScan, btnQuanLyThongTin;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     //qr code scanner object
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //View objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
-        btnTestFirebase = (Button) findViewById(R.id.btnTestFirebase);
+        btnQuanLyThongTin = (Button) findViewById(R.id.btnQuanLyThongTin);
 
         //intializing scan object
         qrScan = new IntentIntegrator(this);
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //attaching onclick listener
         buttonScan.setOnClickListener(this);
 
-        btnTestFirebase.setOnClickListener(this);
+        btnQuanLyThongTin.setOnClickListener(this);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //initiating the qr code scan
                 qrScan.initiateScan();
                 break;
-            case R.id.btnTestFirebase:
+            case R.id.btnQuanLyThongTin:
 
                 break;
         }
