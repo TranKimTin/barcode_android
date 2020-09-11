@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+
+import com.example.barcode.Object.User;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,9 +18,10 @@ import java.util.Locale;
 
 public class AddUserActivity extends AppCompatActivity implements View.OnClickListener {
     private Calendar myCalendar = Calendar.getInstance();
-    private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMT;
+    private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
     private DatePickerDialog.OnDateSetListener date;
     private Button btnAddUser;
+    private String TAG = "ADD_USER";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +32,8 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
         edtBirthDay = (EditText) findViewById(R.id.edtBirthday);
         edtAdress = (EditText) findViewById(R.id.edtAdress);
         edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
-        edtCMT = (EditText) findViewById(R.id.edtCMT);
-
+        edtCMND = (EditText) findViewById(R.id.edtCMND);
+        btnAddUser = (Button) findViewById(R.id.btnAddUser);
 
         myCalendar.set(2000,1,1);
         date = new DatePickerDialog.OnDateSetListener() {
@@ -48,6 +52,7 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
         };
 
         edtBirthDay.setOnClickListener(this);
+        btnAddUser.setOnClickListener(this);
     }
 
     @Override
@@ -60,7 +65,14 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
             case R.id.btnAddUser:
+                User user = new User();
+                user.setName(edtName.getText().toString());
+                user.setAdress(edtAdress.getText().toString());
+                user.setCMND(edtCMND.getText().toString());
+                user.setDateOfBirth(myCalendar.getTime());
+                user.setPhoneNumber(edtPhoneNumber.getText().toString());
 
+                Log.i(TAG,user.getId());
                 break;
         }
     }
