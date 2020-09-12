@@ -1,4 +1,4 @@
-package com.example.barcode;
+package com.example.barcode.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.barcode.R;
 
 public class ManagementActivity extends AppCompatActivity implements View.OnClickListener{
     Button btnAddUser;

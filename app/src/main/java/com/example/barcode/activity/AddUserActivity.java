@@ -1,4 +1,4 @@
-package com.example.barcode;
+package com.example.barcode.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,7 +10,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
-import com.example.barcode.Object.User;
+import com.example.barcode.object.User;
+import com.example.barcode.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -72,7 +73,9 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
                 user.setDateOfBirth(myCalendar.getTime());
                 user.setPhoneNumber(edtPhoneNumber.getText().toString());
 
-                Log.i(TAG,user.getId());
+                Log.i(TAG,"id: " + user.getId());
+
+
                 break;
         }
     }

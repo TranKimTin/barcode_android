@@ -1,6 +1,16 @@
-package com.example.barcode.Object;
+package com.example.barcode.object;
+
+import android.content.Context;
+import android.content.Intent;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
+
+import androidx.annotation.NonNull;
 
 public class User {
     private String id;
@@ -76,7 +86,7 @@ public class User {
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,2));
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
