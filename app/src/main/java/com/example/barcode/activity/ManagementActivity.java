@@ -12,7 +12,6 @@ import android.widget.ListView;
 import com.example.barcode.R;
 import com.example.barcode.adapter.AdapterUser;
 import com.example.barcode.object.User;
-import com.example.barcode.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -56,7 +55,7 @@ public class ManagementActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btnAddUser:
-                Intent i = new Intent(ManagementActivity.this, AddUserActivity.class);
+                Intent i = new Intent(ManagementActivity.this, UserActivity.class);
                 i.putExtra("type","add");
                 startActivity(i);
                 break;

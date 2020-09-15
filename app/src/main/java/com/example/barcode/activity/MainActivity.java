@@ -1,17 +1,25 @@
 package com.example.barcode.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.barcode.R;
+import com.example.barcode.object.User;
+import com.example.barcode.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button buttonScan, btnQuanLyThongTin;
@@ -50,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 qrScan.initiateScan();
                 break;
             case R.id.btnQuanLyThongTin:
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                startActivity(new Intent(MainActivity.this, ManagementActivity.class));
                 break;
         }
 
@@ -63,9 +71,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (result != null) {
             //if qrcode has nothing in it
             if (result.getContents() == null) {
-                Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
+                Util.toast(this, "Không phát hiện mã");
             } else {
-                Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
+                String id = result.getContents();
+                db.collection("user").whereEqualTo("id", id).limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            QuerySnapshot snap = task.getResult();
+                            if(snap.isEmpty()){
+                                Util.toast(getApplicationContext(), "Không tìm thấy user");
+                            }
+                            else{
+                                User u = snap.getDocuments().get(0).toObject(User.class);
+                                Intent i = new Intent(MainActivity.this, UserActivity.class);
+                                i.putExtra("type","view");
+                                i.putExtra("user", (Parcelable) u);
+                                startActivity(i);
+                            }
+
+                        }
+                        else {
+                            Util.toast(getApplicationContext(), "Có lỗi xảy ra, vui lòng thử lại");
+                        }
+                    }
+                });
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

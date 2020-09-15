@@ -2,7 +2,6 @@ package com.example.barcode.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.multidex.MultiDex;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -14,23 +13,20 @@ import android.widget.EditText;
 
 import com.example.barcode.object.User;
 import com.example.barcode.R;
-import com.example.barcode.util.DB;
 import com.example.barcode.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
-public class AddUserActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserActivity extends AppCompatActivity implements View.OnClickListener {
     private Calendar myCalendar = Calendar.getInstance();
     private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
     private DatePickerDialog.OnDateSetListener date;
@@ -41,7 +37,12 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_user);
+        setContentView(R.layout.activity_user);
+
+        if(getIntent().getStringExtra("type").equals("view")){
+            User u = (User) getIntent().getSerializableExtra("user");
+            Util.toast(getApplicationContext(), u.getName());
+        }
 
         edtName = (EditText) findViewById(R.id.edtName);
         edtBirthDay = (EditText) findViewById(R.id.edtBirthday);
@@ -76,7 +77,7 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
         switch (view.getId()){
             case R.id.edtBirthday:
                 // TODO Auto-generated method stub
-                new DatePickerDialog(AddUserActivity.this, date, myCalendar
+                new DatePickerDialog(UserActivity.this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;

@@ -2,6 +2,8 @@ package com.example.barcode.object;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -12,7 +14,7 @@ import java.util.Date;
 
 import androidx.annotation.NonNull;
 
-public class User {
+public class User implements Parcelable {
     private String id;
     private String name;
     private Date dateOfBirth;
@@ -78,6 +80,16 @@ public class User {
         this.adress = adress;
         this.phoneNumber = phoneNumber;
         this.CMND = CMND;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 
     String MD5(String md5) {
