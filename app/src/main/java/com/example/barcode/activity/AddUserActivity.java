@@ -1,6 +1,8 @@
 package com.example.barcode.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.multidex.MultiDex;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -12,9 +14,20 @@ import android.widget.EditText;
 
 import com.example.barcode.object.User;
 import com.example.barcode.R;
+import com.example.barcode.util.DB;
+import com.example.barcode.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AddUserActivity extends AppCompatActivity implements View.OnClickListener {
@@ -23,6 +36,7 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
     private DatePickerDialog.OnDateSetListener date;
     private Button btnAddUser;
     private String TAG = "ADD_USER";
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +68,7 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
 
         edtBirthDay.setOnClickListener(this);
         btnAddUser.setOnClickListener(this);
+
     }
 
     @Override
@@ -66,16 +81,48 @@ public class AddUserActivity extends AppCompatActivity implements View.OnClickLi
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
             case R.id.btnAddUser:
-                User user = new User();
-                user.setName(edtName.getText().toString());
-                user.setAdress(edtAdress.getText().toString());
-                user.setCMND(edtCMND.getText().toString());
-                user.setDateOfBirth(myCalendar.getTime());
-                user.setPhoneNumber(edtPhoneNumber.getText().toString());
+                final User u = new User();
+                u.setName(edtName.getText().toString());
+                u.setAdress(edtAdress.getText().toString());
+                u.setCMND(edtCMND.getText().toString());
+                u.setDateOfBirth(myCalendar.getTime());
+                u.setPhoneNumber(edtPhoneNumber.getText().toString());
 
-                Log.i(TAG,"id: " + user.getId());
+                Log.i(TAG,"id: " + u.getId());
+//                DB.addUser(getApplicationContext(), user);
+                db.collection("user").whereEqualTo("id", u.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            QuerySnapshot doc = task.getResult();
+                            if(doc.isEmpty()){
+                                db.collection("user").add(u).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                        if(task.isSuccessful()) {
+                                            Util.toast(getApplicationContext(), "Thêm user thành công");
+                                            finish();
+                                        }
+                                        else{
+                                            Log.d(TAG, "Error add user: ", task.getException());
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Util.toast(getApplicationContext(), "Thêm thất bại");
+                                    }
+                                });
+                            }
+                            else{
+                                Util.toast(getApplicationContext(), "Đã tồn tại user với số CMND " + u.getCMND());
+                            }
 
-
+                        }else{
+                            Log.e(TAG,"lỗi get user");
+                        }
+                    }
+                });
                 break;
         }
     }
