@@ -31,25 +31,30 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
     private DatePickerDialog.OnDateSetListener date;
     private Button btnAddUser;
-    private String TAG = "ADD_USER";
+    private final String TAG = "ADD_USER";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private User user;
+    private String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
-        if(getIntent().getStringExtra("type").equals("view")){
-            User u = (User) getIntent().getSerializableExtra("user");
-            Util.toast(getApplicationContext(), u.getName());
+        type = getIntent().getStringExtra("type");
+        if(type.equals("view")){
+            user = (User) getIntent().getExtras().getParcelable("user");
+            Util.toast(getApplicationContext(), user.getName());
+            setView();
         }
-
-        edtName = (EditText) findViewById(R.id.edtName);
-        edtBirthDay = (EditText) findViewById(R.id.edtBirthday);
-        edtAdress = (EditText) findViewById(R.id.edtAdress);
-        edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
-        edtCMND = (EditText) findViewById(R.id.edtCMND);
-        btnAddUser = (Button) findViewById(R.id.btnAddUser);
+        else if(type.equals("edit")){
+            user = (User) getIntent().getExtras().getParcelable("user");
+            setView();
+        }
+        else if(type.equals("add")){
+            user = new User();
+            setView();
+        }
 
         myCalendar.set(2000,1,1);
         date = new DatePickerDialog.OnDateSetListener() {
@@ -82,22 +87,21 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
             case R.id.btnAddUser:
-                final User u = new User();
-                u.setName(edtName.getText().toString());
-                u.setAdress(edtAdress.getText().toString());
-                u.setCMND(edtCMND.getText().toString());
-                u.setDateOfBirth(myCalendar.getTime());
-                u.setPhoneNumber(edtPhoneNumber.getText().toString());
+                user.setName(edtName.getText().toString());
+                user.setAdress(edtAdress.getText().toString());
+                user.setCMND(edtCMND.getText().toString());
+                user.setDateOfBirth(myCalendar.getTime());
+                user.setPhoneNumber(edtPhoneNumber.getText().toString());
 
-                Log.i(TAG,"id: " + u.getId());
+                Log.i(TAG,"id: " + user.getId());
 //                DB.addUser(getApplicationContext(), user);
-                db.collection("user").whereEqualTo("id", u.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                db.collection("user").whereEqualTo("id", user.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
                             QuerySnapshot doc = task.getResult();
                             if(doc.isEmpty()){
-                                db.collection("user").add(u).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                db.collection("user").add(user).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentReference> task) {
                                         if(task.isSuccessful()) {
@@ -116,7 +120,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                                 });
                             }
                             else{
-                                Util.toast(getApplicationContext(), "Đã tồn tại user với số CMND " + u.getCMND());
+                                Util.toast(getApplicationContext(), "Đã tồn tại user với số CMND " + user.getCMND());
                             }
 
                         }else{
@@ -127,4 +131,22 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
+    private void setView(){
+        edtName = (EditText) findViewById(R.id.edtName);
+        edtBirthDay = (EditText) findViewById(R.id.edtBirthday);
+        edtAdress = (EditText) findViewById(R.id.edtAdress);
+        edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
+        edtCMND = (EditText) findViewById(R.id.edtCMND);
+        btnAddUser = (Button) findViewById(R.id.btnAddUser);
+
+        String myFormat = "MM/dd/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        edtName.setText(user.getName());
+        edtBirthDay.setText(sdf.format(user.getDateOfBirth().getTime()));
+        edtAdress.setText(user.getAdress());
+        edtPhoneNumber.setText(user.getPhoneNumber());
+        edtCMND.setText(user.getCMND());
+    }
+
 }

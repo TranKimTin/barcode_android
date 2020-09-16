@@ -1,18 +1,9 @@
 package com.example.barcode.object;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.Date;
-
-import androidx.annotation.NonNull;
 
 public class User implements Parcelable {
     private String id;
@@ -71,7 +62,9 @@ public class User implements Parcelable {
         this.id = MD5(CMND);
     }
 
-    public User(){}
+    public User(){
+        this.dateOfBirth = new Date(0);
+    }
 
     public User(String id, String name, Date dateOfBirth, String adress, String phoneNumber, String CMND) {
         this.id = id;
@@ -81,15 +74,28 @@ public class User implements Parcelable {
         this.phoneNumber = phoneNumber;
         this.CMND = CMND;
     }
+    public User(Parcel in){
+        this.id = in.readString();
+        this.name = in.readString();
+        this.dateOfBirth = new Date(in.readLong());
+        this.adress = in.readString();
+        this.phoneNumber = in.readString();
+        this.CMND = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeLong(this.dateOfBirth.getTime());
+        dest.writeString(this.adress);
+        dest.writeString(this.phoneNumber);
+        dest.writeString(this.CMND);
+    }
 
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-
     }
 
     String MD5(String md5) {
@@ -105,4 +111,14 @@ public class User implements Parcelable {
         }
         return null;
     }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
