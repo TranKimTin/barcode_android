@@ -8,6 +8,14 @@ public class Util {
     static final String TAG = "TOAST";
     public static void toast(Context context, String message){
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        logD(message);
+    }
+
+    public static void logD(String message){
         Log.d(TAG, message);
+    }
+
+    public static void logE(String message){
+        Log.e(TAG, message);
     }
 }

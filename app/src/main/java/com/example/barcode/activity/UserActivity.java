@@ -4,12 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.example.barcode.object.User;
 import com.example.barcode.R;
@@ -20,9 +24,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -35,6 +45,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private User user;
     private String type;
+    private ImageView imgBarCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +56,14 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         if(type.equals("view")){
             user = (User) getIntent().getExtras().getParcelable("user");
             Util.toast(getApplicationContext(), user.getName());
-            setView();
         }
         else if(type.equals("edit")){
             user = (User) getIntent().getExtras().getParcelable("user");
-            setView();
         }
         else if(type.equals("add")){
             user = new User();
-            setView();
         }
+        setView();
 
         myCalendar.set(2000,1,1);
         date = new DatePickerDialog.OnDateSetListener() {
@@ -81,6 +90,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.edtBirthday:
+                if(type.equals("view")) break;
                 // TODO Auto-generated method stub
                 new DatePickerDialog(UserActivity.this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
@@ -139,6 +149,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
         edtCMND = (EditText) findViewById(R.id.edtCMND);
         btnAddUser = (Button) findViewById(R.id.btnAddUser);
+        imgBarCode = (ImageView) findViewById(R.id.imgBarCode);
 
         String myFormat = "MM/dd/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
@@ -147,6 +158,39 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         edtAdress.setText(user.getAdress());
         edtPhoneNumber.setText(user.getPhoneNumber());
         edtCMND.setText(user.getCMND());
+
+        if(type.equals("view")){
+            try {
+                imgBarCode.setImageBitmap(createBarcodeBitmap(user.getId(), 1080, 210));
+            } catch (WriterException e) {
+                Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
+            }
+            edtCMND.setFocusable(false);
+            edtPhoneNumber.setFocusable(false);
+            edtAdress.setFocusable(false);
+            edtBirthDay.setFocusable(false);
+            edtName.setFocusable(false);
+
+        }
+    }
+    private Bitmap createBarcodeBitmap(String data, int width, int height) throws WriterException {
+        MultiFormatWriter writer = new MultiFormatWriter();
+        String finalData = Uri.encode(data);
+
+        // Use 1 as the height of the matrix as this is a 1D Barcode.
+        BitMatrix bm = writer.encode(finalData, BarcodeFormat.CODE_128, width, 1);
+        int bmWidth = bm.getWidth();
+
+        Bitmap imageBitmap = Bitmap.createBitmap(bmWidth, height, Bitmap.Config.ARGB_8888);
+
+        for (int i = 0; i < bmWidth; i++) {
+            // Paint columns of width 1
+            int[] column = new int[height];
+            Arrays.fill(column, bm.get(i, 0) ? Color.BLACK : Color.WHITE);
+            imageBitmap.setPixels(column, 0, 1, i, 0, 1, height);
+        }
+
+        return imageBitmap;
     }
 
 }
