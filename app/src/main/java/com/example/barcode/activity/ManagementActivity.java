@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -47,6 +49,16 @@ public class ManagementActivity extends AppCompatActivity implements View.OnClic
                 }
                 AdapterUser adapterUser = new AdapterUser(getApplicationContext(),R.layout.item_user, listUser);
                 lvListUser.setAdapter(adapterUser);
+            }
+        });
+
+        lvListUser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                intent.putExtra("type","view");
+                intent.putExtra("user", (Parcelable) adapterView.getAdapter().getItem(position));
+                startActivity(intent);
             }
         });
     }

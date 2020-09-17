@@ -55,7 +55,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         type = getIntent().getStringExtra("type");
         if(type.equals("view")){
             user = (User) getIntent().getExtras().getParcelable("user");
-            Util.toast(getApplicationContext(), user.getName());
+//            Util.toast(getApplicationContext(), user.getName());
         }
         else if(type.equals("edit")){
             user = (User) getIntent().getExtras().getParcelable("user");
@@ -170,6 +170,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             edtAdress.setFocusable(false);
             edtBirthDay.setFocusable(false);
             edtName.setFocusable(false);
+            btnAddUser.setVisibility(View.GONE);
 
         }
     }
