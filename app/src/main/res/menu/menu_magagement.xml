@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Thêm mới"
+        android:id="@+id/itemAddUser"/>
+    <item
+        android:title="Thoát"
+        android:id="@+id/itemCancel" />
+</menu>

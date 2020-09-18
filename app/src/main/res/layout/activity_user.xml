@@ -106,11 +106,24 @@
             android:inputType="phone"
             android:digits="0123456789" />
     </LinearLayout>
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lưu"
-        android:id="@+id/btnAddUser"
-        android:layout_gravity="right"
-        android:layout_marginTop="20dp"/>
+        android:orientation="horizontal"
+        android:gravity="right">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quay lại"
+            android:id="@+id/btnCancel"
+            android:layout_marginTop="20dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lưu"
+            android:id="@+id/btnSaveUser"
+            android:layout_marginTop="20dp"/>
+    </LinearLayout>
+
+
 </LinearLayout>

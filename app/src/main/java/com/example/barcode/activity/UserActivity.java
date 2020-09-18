@@ -9,6 +9,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -40,7 +43,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private Calendar myCalendar = Calendar.getInstance();
     private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
     private DatePickerDialog.OnDateSetListener date;
-    private Button btnAddUser;
+    private Button btnSaveUser, btnCancel;
     private final String TAG = "ADD_USER";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private User user;
@@ -81,9 +84,6 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
-        edtBirthDay.setOnClickListener(this);
-        btnAddUser.setOnClickListener(this);
-
     }
 
     @Override
@@ -96,7 +96,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
-            case R.id.btnAddUser:
+            case R.id.btnSaveUser:
                 user.setName(edtName.getText().toString());
                 user.setAdress(edtAdress.getText().toString());
                 user.setCMND(edtCMND.getText().toString());
@@ -104,7 +104,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 user.setPhoneNumber(edtPhoneNumber.getText().toString());
 
                 Log.i(TAG,"id: " + user.getId());
-//                DB.addUser(getApplicationContext(), user);
+
                 db.collection("user").whereEqualTo("id", user.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -139,18 +139,29 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 break;
+            case R.id.btnCancel:
+                finish();
+                break;
         }
     }
 
     private void setView(){
+        //find view
         edtName = (EditText) findViewById(R.id.edtName);
         edtBirthDay = (EditText) findViewById(R.id.edtBirthday);
         edtAdress = (EditText) findViewById(R.id.edtAdress);
         edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
         edtCMND = (EditText) findViewById(R.id.edtCMND);
-        btnAddUser = (Button) findViewById(R.id.btnAddUser);
+        btnSaveUser = (Button) findViewById(R.id.btnSaveUser);
         imgBarCode = (ImageView) findViewById(R.id.imgBarCode);
+        btnCancel = (Button) findViewById(R.id.btnCancel);
 
+        //set click button
+        edtBirthDay.setOnClickListener(this);
+        btnSaveUser.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+
+        //set text to view
         String myFormat = "MM/dd/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         edtName.setText(user.getName());
@@ -170,10 +181,15 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             edtAdress.setFocusable(false);
             edtBirthDay.setFocusable(false);
             edtName.setFocusable(false);
-            btnAddUser.setVisibility(View.GONE);
+            btnSaveUser.setVisibility(View.GONE);
 
         }
+        if(type.equals("edit")){
+            btnSaveUser.setText("Sửa");
+        }
     }
+
+    //tao ma barcode
     private Bitmap createBarcodeBitmap(String data, int width, int height) throws WriterException {
         MultiFormatWriter writer = new MultiFormatWriter();
         String finalData = Uri.encode(data);
@@ -193,5 +209,6 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
 
         return imageBitmap;
     }
+
 
 }
