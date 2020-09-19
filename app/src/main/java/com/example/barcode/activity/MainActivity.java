@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonScan, btnQuanLyThongTin;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    //qr code scanner object
-    private IntentIntegrator qrScan;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,14 +33,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //View objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
         btnQuanLyThongTin = (Button) findViewById(R.id.btnQuanLyThongTin);
-
-        //intializing scan object
-        qrScan = new IntentIntegrator(this);
-        qrScan.setDesiredBarcodeFormats(IntentIntegrator.CODE_128);
-        qrScan.setPrompt("Quét mã vạch");
-        qrScan.setOrientationLocked(false);
-        qrScan.setBeepEnabled(true);
-        qrScan.setCaptureActivity(CaptureActivityPortrait.class);
 
         //attaching onclick listener
         buttonScan.setOnClickListener(this);
@@ -55,13 +45,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.buttonScan:
                 //initiating the qr code scan
+                IntentIntegrator qrScan = new IntentIntegrator(this);
+                qrScan.setDesiredBarcodeFormats(IntentIntegrator.CODE_128);
+                qrScan.setPrompt("Quét mã vạch");
+                qrScan.setOrientationLocked(false);
+                qrScan.setBeepEnabled(true);
+                qrScan.setCaptureActivity(CaptureActivityPortrait.class);
                 qrScan.initiateScan();
                 break;
             case R.id.btnQuanLyThongTin:
                 startActivity(new Intent(MainActivity.this, ManagementActivity.class));
                 break;
         }
-
     }
 
     //Getting the scan results
@@ -84,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             else{
                                 User u = snap.getDocuments().get(0).toObject(User.class);
-                                Intent i = new Intent(MainActivity.this, UserActivity.class);
+                                Intent i = new Intent(getApplicationContext(), UserActivity.class);
                                 i.putExtra("type","view");
-                                i.putExtra("user", (Parcelable) u);
+                                i.putExtra("user", u);
                                 startActivity(i);
                             }
 

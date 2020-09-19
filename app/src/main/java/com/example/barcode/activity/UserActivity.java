@@ -47,7 +47,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private final String TAG = "ADD_USER";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private User user;
-    private String type;
+    private String type, idFirestore ;
     private ImageView imgBarCode;
 
     @Override
@@ -62,13 +62,15 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if(type.equals("edit")){
             user = (User) getIntent().getExtras().getParcelable("user");
+            idFirestore = getIntent().getStringExtra("id_firestore");
         }
         else if(type.equals("add")){
             user = new User();
         }
         setView();
 
-        myCalendar.set(2000,1,1);
+        if(type.equals("add"))  myCalendar.set(2000,1,1);
+        else    myCalendar.setTime(user.getDateOfBirth());
         date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -110,28 +112,49 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
                             QuerySnapshot doc = task.getResult();
-                            if(doc.isEmpty()){
-                                db.collection("user").add(user).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                                        if(task.isSuccessful()) {
-                                            Util.toast(getApplicationContext(), "Thêm user thành công");
+                            if(type.equals("add")){
+                                if(doc.isEmpty()){
+                                    db.collection("user").add(user).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                                            if(task.isSuccessful()) {
+                                                Util.toast(getApplicationContext(), "Thêm user thành công");
+                                                finish();
+                                            }
+                                            else{
+                                                Log.d(TAG, "Error add user: ", task.getException());
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Util.toast(getApplicationContext(), "Thêm thất bại");
+                                        }
+                                    });
+                                }
+                                else{
+                                    Util.toast(getApplicationContext(), "Đã tồn tại user với số CMND " + user.getCMND());
+                                }
+                            }else if(type.equals("edit")){
+                                if(doc.isEmpty() || doc.getDocuments().get(0).getId().equals(idFirestore)){
+                                    db.collection("user").document(idFirestore).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Util.toast(getApplicationContext(), "Sửa thành công");
                                             finish();
                                         }
-                                        else{
-                                            Log.d(TAG, "Error add user: ", task.getException());
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Util.toast(getApplicationContext(), "Có lỗi xảy ra khi sửa user");
                                         }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Util.toast(getApplicationContext(), "Thêm thất bại");
-                                    }
-                                });
+                                    });
+                                }else{
+                                    Util.toast(getApplicationContext(), "Đã tồn tại user khác với số CMND " + user.getCMND());
+                                }
                             }
-                            else{
-                                Util.toast(getApplicationContext(), "Đã tồn tại user với số CMND " + user.getCMND());
-                            }
+
 
                         }else{
                             Log.e(TAG,"lỗi get user");

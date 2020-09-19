@@ -16,20 +16,52 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Tìm kiếm..."
-            android:layout_weight="8"/>
+            android:layout_weight="8"
+            android:id="@+id/edtSearch"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tìm kiếm"
-            android:layout_weight="2" />
+            android:layout_weight="2"
+            android:id="@+id/btnSearch"/>
     </LinearLayout>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvResourceId"/>
-    <ListView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lvListUser"/>
-
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:id="@+id/lvListUser"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="0"
+            android:gravity="right">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&lt;"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:id="@+id/btnPrevios"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:digits="0123456789."
+                android:inputType="number"
+                android:paddingHorizontal="20dp"
+                android:id="@+id/edtPageIndex"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&gt;"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:id="@+id/btnNext"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

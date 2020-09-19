@@ -4,6 +4,9 @@
         android:title="Thêm mới"
         android:id="@+id/itemAddUser"/>
     <item
+        android:title="Quét mã vạch"
+        android:id="@+id/itemScanBarcode" />
+    <item
         android:title="Thoát"
         android:id="@+id/itemCancel" />
 </menu>
