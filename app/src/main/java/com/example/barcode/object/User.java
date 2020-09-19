@@ -3,7 +3,11 @@ package com.example.barcode.object;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class User implements Parcelable {
     private String id;
@@ -12,6 +16,7 @@ public class User implements Parcelable {
     private String adress;
     private String phoneNumber;
     private String CMND;
+    private List<String> subName;
 
     public String getAdress() {
         return adress;
@@ -35,10 +40,20 @@ public class User implements Parcelable {
 
     public void setName(String name) {
         this.name = name;
+
+        generatorSubName();
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public List<String> getSubName() {
+        return subName;
+    }
+
+    public void setSubName(List<String> subName) {
+        this.subName = subName;
     }
 
     public void setPhoneNumber(String phoneNumber) {
@@ -64,6 +79,8 @@ public class User implements Parcelable {
 
     public User(){
         this.dateOfBirth = new Date(0);
+        this.subName = new ArrayList<String>();
+        subName.add("");
     }
 
     public User(String id, String name, Date dateOfBirth, String adress, String phoneNumber, String CMND) {
@@ -81,6 +98,8 @@ public class User implements Parcelable {
         this.adress = in.readString();
         this.phoneNumber = in.readString();
         this.CMND = in.readString();
+
+        generatorSubName();
     }
 
     @Override
@@ -121,4 +140,17 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    private void generatorSubName(){
+        String lowerName = this.name.toLowerCase();
+        this.subName = new ArrayList<String>();
+        Set<String> set = new HashSet<String>();
+        set.add("");
+        for(int i=0; i<lowerName.length()-1; i++){
+            for(int j=i+1; j<=lowerName.length(); j++){
+                set.add(lowerName.substring(i,j));
+            }
+        }
+        this.subName.addAll(set);
+    }
 }

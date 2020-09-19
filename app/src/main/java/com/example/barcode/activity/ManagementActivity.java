@@ -44,7 +44,7 @@ public class ManagementActivity extends AppCompatActivity implements View.OnClic
     private ListenerRegistration listenerUserChange;
     private Button btnSearch, btnPrevios, btnNext;
     private EditText edtSearch, edtPageIndex;
-    private int pageSize = 2, pageIndex = 1, count = 0;
+    private int pageSize = 25, pageIndex = 1, count = 0;
     private String textSearch = "";
 
     @Override
@@ -224,12 +224,14 @@ public class ManagementActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void search(){
+        textSearch = textSearch.toLowerCase();
         if(listenerUserChange != null) listenerUserChange.remove();
-        listenerUserChange = db.collection("user").orderBy("name").limit(pageSize).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        listenerUserChange = db.collection("user").whereArrayContains("subName", textSearch).orderBy("name").limit(pageSize).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
                     Util.logE("Listen failed.", error);
+                    Util.toast(getApplicationContext(), "Có lỗi xảy ra, vui lòng thử lại");
                     return;
                 }
                 List<User> listUser = new ArrayList<User>();
@@ -239,7 +241,6 @@ public class ManagementActivity extends AppCompatActivity implements View.OnClic
                 }
                 AdapterUser adapterUser = new AdapterUser(getApplicationContext(),R.layout.item_user, listUser);
                 lvListUser.setAdapter(adapterUser);
-
             }
         });
     }

@@ -104,7 +104,10 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 user.setCMND(edtCMND.getText().toString());
                 user.setDateOfBirth(myCalendar.getTime());
                 user.setPhoneNumber(edtPhoneNumber.getText().toString());
-
+                if(user.getCMND().trim().equals("")){
+                    Util.toast(getApplicationContext(), "Số CMND không được để trống");
+                    return;
+                }
                 Log.i(TAG,"id: " + user.getId());
 
                 db.collection("user").whereEqualTo("id", user.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
