@@ -147,8 +147,9 @@ public class User implements Parcelable {
         Set<String> set = new HashSet<String>();
         set.add("");
         for(int i=0; i<lowerName.length()-1; i++){
+            if(lowerName.charAt(i) == ' ') continue;
             for(int j=i+1; j<=lowerName.length(); j++){
-                set.add(lowerName.substring(i,j));
+                set.add(lowerName.substring(i,j).trim());
             }
         }
         this.subName.addAll(set);

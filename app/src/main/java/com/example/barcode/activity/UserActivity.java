@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -17,7 +18,9 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.example.barcode.dialog.DialogCMND;
 import com.example.barcode.object.User;
 import com.example.barcode.R;
 import com.example.barcode.util.Util;
@@ -43,7 +46,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private Calendar myCalendar = Calendar.getInstance();
     private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
     private DatePickerDialog.OnDateSetListener date;
-    private Button btnSaveUser, btnCancel;
+    private Button btnSaveUser, btnCancel, btnCmnd;
     private final String TAG = "ADD_USER";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private User user;
@@ -168,6 +171,10 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnCancel:
                 finish();
                 break;
+            case R.id.btnCmnd:
+                DialogCMND dialog = new DialogCMND(UserActivity.this);
+             //   Toast.makeText(this,"asd",Toast.LENGTH_LONG).show();
+                dialog.show();
         }
     }
 
@@ -181,11 +188,13 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         btnSaveUser = (Button) findViewById(R.id.btnSaveUser);
         imgBarCode = (ImageView) findViewById(R.id.imgBarCode);
         btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnCmnd = (Button) findViewById(R.id.btnCmnd);
 
         //set click button
         edtBirthDay.setOnClickListener(this);
         btnSaveUser.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+        btnCmnd.setOnClickListener(this);
 
         //set text to view
         String myFormat = "MM/dd/yyyy"; //In which you need put here
