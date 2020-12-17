@@ -1,5 +1,6 @@
 package com.example.barcode.object;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -17,6 +18,42 @@ public class User implements Parcelable {
     private String phoneNumber;
     private String CMND;
     private List<String> subName;
+    private IdNumber idNumber;
+    private DriverLicense driverLicense;
+    private CGV cgv;
+    private StudentCard studentCard;
+
+    public StudentCard getStudentCard() {
+        return studentCard;
+    }
+
+    public void setStudentCard(StudentCard studentCard) {
+        this.studentCard = studentCard;
+    }
+
+    public CGV getCgv() {
+        return cgv;
+    }
+
+    public void setCgv(CGV cgv) {
+        this.cgv = cgv;
+    }
+
+    public IdNumber getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(IdNumber idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    public DriverLicense getDriverLicense() {
+        return driverLicense;
+    }
+
+    public void setDriverLicense(DriverLicense driverLicense) {
+        this.driverLicense = driverLicense;
+    }
 
     public String getAdress() {
         return adress;
@@ -83,14 +120,20 @@ public class User implements Parcelable {
         subName.add("");
     }
 
-    public User(String id, String name, Date dateOfBirth, String adress, String phoneNumber, String CMND) {
+    public User(String id, String name, Date dateOfBirth, String adress, String phoneNumber, String CMND, List<String> subName, IdNumber idNumber, DriverLicense driverLicense, CGV cgv, StudentCard studentCard) {
         this.id = id;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.adress = adress;
         this.phoneNumber = phoneNumber;
         this.CMND = CMND;
+        this.subName = subName;
+        this.idNumber = idNumber;
+        this.driverLicense = driverLicense;
+        this.cgv = cgv;
+        this.studentCard = studentCard;
     }
+
     public User(Parcel in){
         this.id = in.readString();
         this.name = in.readString();
@@ -98,7 +141,10 @@ public class User implements Parcelable {
         this.adress = in.readString();
         this.phoneNumber = in.readString();
         this.CMND = in.readString();
-
+        this.idNumber = (IdNumber) in.readParcelable(IdNumber.class.getClassLoader());
+        this.driverLicense = (DriverLicense) in.readParcelable(DriverLicense.class.getClassLoader());
+        this.cgv = (CGV) in.readParcelable(CGV.class.getClassLoader());
+        this.studentCard = (StudentCard) in.readParcelable(StudentCard.class.getClassLoader());
         generatorSubName();
     }
 
@@ -110,6 +156,10 @@ public class User implements Parcelable {
         dest.writeString(this.adress);
         dest.writeString(this.phoneNumber);
         dest.writeString(this.CMND);
+        dest.writeParcelable(idNumber, flags);
+        dest.writeParcelable(driverLicense, flags);
+        dest.writeParcelable(cgv, flags);
+        dest.writeParcelable(studentCard, flags);
     }
 
     @Override

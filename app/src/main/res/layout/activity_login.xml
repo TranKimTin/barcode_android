@@ -11,7 +11,7 @@
         android:layout_height="17dp"
         android:layout_marginStart="28dp"
         android:layout_marginTop="104dp"
-        android:text="Email"
+        android:text="Số điện thoại"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,31 +21,31 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
         android:layout_marginTop="64dp"
-        android:text="Mật khẩu"
+        android:text="Mã otp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
-        android:id="@+id/btnUsername"
+        android:id="@+id/edtPhoneNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="84dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="phone"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/btnPassword"
+        android:id="@+id/edtOtp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginTop="40dp"
         android:ems="10"
-        android:inputType="textPassword"
+        android:inputType="number"
         app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/btnUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/edtPhoneNumber" />
 
     <Button
         android:id="@+id/btnLogin"
@@ -56,7 +56,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.811"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnPassword"
+        app:layout_constraintTop_toBottomOf="@+id/edtOtp"
         app:layout_constraintVertical_bias="0.223" />
+
+    <Button
+        android:id="@+id/btnSendCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Gửi mã otp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnLogin"
+        app:layout_constraintHorizontal_bias="0.604"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtOtp"
+        app:layout_constraintVertical_bias="0.227" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

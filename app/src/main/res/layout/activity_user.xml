@@ -109,9 +109,28 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thông tin CMND"
+        android:text="Chứng minh nhân dân"
         android:id="@+id/btnCmnd"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bằng lái xe"
+        android:id="@+id/btnDriverLicense"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thẻ CGV"
+        android:id="@+id/btnCGV"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thẻ sinh viên"
+        android:id="@+id/btnStudentCard"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

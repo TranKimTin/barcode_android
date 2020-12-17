@@ -8,9 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:src="@drawable/icon_plus"
-        android:id="@+id/imvCMND"
+        android:id="@+id/imvDriverLicense"
         android:padding="10dp"
-       />
+        />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,13 +20,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Số CMND: "/>
+            android:text="Số: "/>
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:id="@+id/edtCMND_dialog_cmnd"
+            android:id="@+id/edtNumber_dialog_driver_license"
             android:inputType="phone"
             android:digits="0123456789" />
     </LinearLayout>
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:id="@+id/edtName_dialog_cmnd"/>
+            android:id="@+id/edtName_dialog_driver_license"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -56,12 +56,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Giới tính: "/>
+            android:text="Quốc tịch: "/>
 
-        <Spinner android:id="@+id/spGender_dialog_cmnd"
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="8" />
+            android:layout_weight="8"
+            android:id="@+id/edtContry_dialog_driver_license"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -77,7 +78,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/edtBirthday_dialog_cmnd"
+            android:id="@+id/edtBirthday_dialog_driver_license"
             android:clickable="true"
             android:hint="dd/mm/yyyy"
             android:focusable="false"
@@ -98,24 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:id="@+id/edtAdress_dialog_cmnd"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="10">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="Dân tộc: "/>
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="8"
-            android:id="@+id/edtRegion_dialog_cmnd"/>
+            android:id="@+id/edtAdress_dialog_driver_license"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -131,7 +115,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/edtStartDate_dialog_cmnd"
+            android:id="@+id/edtStartDate_dialog_driver_license"
             android:clickable="true"
             android:hint="dd/mm/yyyy"
             android:focusable="false"
@@ -152,7 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:id="@+id/edtAdress2_dialog_cmnd"/>
+            android:id="@+id/edtAdress2_dialog_driver_license"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -162,14 +146,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quay lại"
-            android:id="@+id/btnCancel_dialog_cmnd"
-            android:layout_marginTop="20dp"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="Lưu"
-            android:id="@+id/btnSaveCmnd"
+            android:id="@+id/btnSaveDriverLicense"
             android:layout_marginTop="20dp"/>
     </LinearLayout>
 </LinearLayout>

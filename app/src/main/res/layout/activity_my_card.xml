@@ -4,34 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivity"
+    tools:context=".activity.MyCardActivity"
     android:orientation="vertical"
+    android:padding="10dp"
     android:gravity="center">
-
-    <Button
-        android:id="@+id/buttonScan"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Scan QR Code"
-        tools:ignore="MissingConstraints" />
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Quản lý thông tin"
-        android:id="@+id/btnQuanLyThongTin"/>
-
+        android:text="Chứng minh nhân dân"
+        android:id="@+id/btnCmnd"
+        />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thẻ của tôi"
-        android:id="@+id/btnMyCard"/>
-
+        android:text="Bằng lái xe"
+        android:id="@+id/btnDriverLicense"
+        />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đăng xuất"
-        android:id="@+id/btnLogout"/>
-
+        android:text="Thẻ CGV"
+        android:id="@+id/btnCGV"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thẻ sinh viên"
+        android:id="@+id/btnStudentCard"
+        />
 </LinearLayout>
