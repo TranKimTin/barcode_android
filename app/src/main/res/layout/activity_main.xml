@@ -6,32 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity"
     android:orientation="vertical"
+    android:background="#FBAFAF"
     android:gravity="center">
 
     <Button
+        android:layout_margin="10dp"
+        android:background="@drawable/custom_button"
         android:id="@+id/buttonScan"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="Scan QR Code"
         tools:ignore="MissingConstraints" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:background="@drawable/custom_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="Quản lý thông tin"
         android:id="@+id/btnQuanLyThongTin"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:background="@drawable/custom_button"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="Thẻ của tôi"
         android:id="@+id/btnMyCard"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+
+        android:background="@drawable/custom_button"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="Đăng xuất"
         android:id="@+id/btnLogout"/>
-
 </LinearLayout>

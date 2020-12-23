@@ -1,5 +1,6 @@
 package com.example.barcode.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,10 +12,18 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.barcode.R;
+import com.example.barcode.dialog.DialogBigC;
 import com.example.barcode.dialog.DialogCGV;
 import com.example.barcode.dialog.DialogCMND;
 import com.example.barcode.dialog.DialogDriverLicense;
 import com.example.barcode.dialog.DialogStudentCard;
+import com.example.barcode.object.User;
+import com.example.barcode.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
@@ -23,11 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyCardActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button btnCmnd, btnDriverLicense, btnStudentCard, btnCGV;
+    private Button btnCmnd, btnDriverLicense, btnStudentCard, btnCGV, btnBigCCard;
     private DialogCMND dialogCMND;
     private DialogDriverLicense dialogDriverLicense;
     private DialogCGV dialogCGV;
     private DialogStudentCard dialogStudentCard;
+    private DialogBigC dialogBigC;
     private int indexBytes;
 
     @Override
@@ -36,6 +46,10 @@ public class MyCardActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_my_card);
 
         setView();
+        initDialog();
+    }
+
+    void initDialog(){
         dialogCMND = new DialogCMND(MyCardActivity.this, MyCardActivity.this);
         dialogCMND.show();
         dialogCMND.dismiss();
@@ -48,6 +62,9 @@ public class MyCardActivity extends AppCompatActivity implements View.OnClickLis
         dialogStudentCard = new DialogStudentCard(MyCardActivity.this, MyCardActivity.this);
         dialogStudentCard.show();
         dialogStudentCard.dismiss();
+        dialogBigC = new DialogBigC(MyCardActivity.this, MyCardActivity.this);
+        dialogBigC.show();
+        dialogBigC.dismiss();
     }
 
     void setView() {
@@ -55,11 +72,13 @@ public class MyCardActivity extends AppCompatActivity implements View.OnClickLis
         btnDriverLicense = (Button) findViewById(R.id.btnDriverLicense);
         btnCGV = (Button) findViewById(R.id.btnCGV);
         btnStudentCard = (Button) findViewById(R.id.btnStudentCard);
+        btnBigCCard = (Button) findViewById(R.id.btnBigCCard);
 
         btnCGV.setOnClickListener(this);
         btnDriverLicense.setOnClickListener(this);
         btnStudentCard.setOnClickListener(this);
         btnCmnd.setOnClickListener(this);
+        btnBigCCard.setOnClickListener(this);
     }
 
     @Override
@@ -81,6 +100,11 @@ public class MyCardActivity extends AppCompatActivity implements View.OnClickLis
                 indexBytes = 3;
                 dialogStudentCard.show();
                 break;
+            case R.id.btnBigCCard:
+                indexBytes=4;
+                dialogBigC.show();
+                break;
+
         }
     }
 
@@ -118,9 +142,40 @@ public class MyCardActivity extends AppCompatActivity implements View.OnClickLis
                     dialogStudentCard.setUri(resultUri);
                     dialogStudentCard.setBytes(baos.toByteArray());
                 }
+                if (indexBytes == 4) {
+                    dialogBigC.setUri(resultUri);
+                    dialogBigC.setBytes(baos.toByteArray());
+                }
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+            }
+        }
+        else{
+            //bar code
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (result != null) {
+                //if qrcode has nothing in it
+                if (result.getContents() == null) {
+                    Util.toast(this, "Không phát hiện mã");
+                } else {
+                    String code = result.getContents();
+                    if(indexBytes != 0) Util.toast(getApplicationContext(), code);
+                    if(indexBytes == 0){
+                        dialogCMND.setCode(code);
+                    }
+                    if(indexBytes == 2){
+                        dialogCGV.setCode(code);
+                    }
+                    if(indexBytes == 3){
+                        dialogStudentCard.setCode(code);
+                    }
+                    if(indexBytes == 4){
+                        dialogBigC.setCode(code);
+                    }
+                }
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
             }
         }
     }

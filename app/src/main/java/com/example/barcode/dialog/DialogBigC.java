@@ -9,21 +9,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.example.barcode.R;
 import com.example.barcode.activity.CaptureActivityPortrait;
-import com.example.barcode.object.CGV;
-import com.example.barcode.object.IdNumber;
-import com.example.barcode.object.StudentCard;
+import com.example.barcode.object.BigC;
 import com.example.barcode.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -45,13 +41,11 @@ import java.util.Locale;
 
 import static com.example.barcode.util.Util.createBarcodeBitmap;
 
-public class DialogCGV extends Dialog implements View.OnClickListener {
+public class DialogBigC extends Dialog implements View.OnClickListener {
     private Button btnSave, btnCancel, btnScanBarcode;
-    private EditText edtCMND, edtNumberCGV, edtName, edtDateOfBirth;
-    private DatePickerDialog.OnDateSetListener date;
-    private Calendar myCalendar = Calendar.getInstance();
-    private ImageView imvCGV;
-    private String TAG = "DIALOG_CGV";
+    private EditText edtNumberBigC, edtName;
+    private ImageView imvBigC;
+    private String TAG = "DIALOG_BigC";
     private Activity activity;
     private Dialog dialog;
     private ImageView imv;
@@ -61,7 +55,7 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
     private String phoneNumber = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+84", "0");
     private ImageView imvBarcode;
 
-    public DialogCGV(@NonNull Context context, Activity activity) {
+    public DialogBigC(@NonNull Context context, Activity activity) {
         super(context);
         this.activity = activity;
     }
@@ -70,39 +64,23 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.dialog_cgv);
+        setContentView(R.layout.dialog_bigc);
         int width = (int) (getContext().getResources().getDisplayMetrics().widthPixels * 0.90);
         int height = (int) (getContext().getResources().getDisplayMetrics().heightPixels * 0.80);
 
         getWindow().setLayout(width, height);
 
         setView();
-        date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                String myFormat = "MM/dd/yyyy"; //In which you need put here
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-
-                edtDateOfBirth.setText(sdf.format(myCalendar.getTime()));
-            }
-        };
     }
 
     void setView() {
-        btnSave = (Button) findViewById(R.id.btnSaveCGV);
-        edtCMND = (EditText) findViewById(R.id.edtCMND_dialog_cgv);
-        edtDateOfBirth = (EditText) findViewById(R.id.edtBirthday_dialog_cgv);
-        edtName = (EditText) findViewById(R.id.edtName_dialog_cgv);
-        edtNumberCGV = (EditText) findViewById(R.id.edtNumber_cgv);
-        imvCGV = (ImageView) findViewById(R.id.imvCGV);
-        btnCancel = (Button) findViewById(R.id.btnCancelCgv);
-        btnScanBarcode = (Button) findViewById(R.id.btnScanCgv);
-        imvBarcode = (ImageView) findViewById(R.id.imvBarcodeCgv);
+        btnSave = (Button) findViewById(R.id.btnSaveBigC);
+        edtName = (EditText) findViewById(R.id.edtName_dialog_bigC);
+        edtNumberBigC = (EditText) findViewById(R.id.edtNumber_BigC);
+        imvBigC = (ImageView) findViewById(R.id.imvBigC);
+        btnCancel = (Button) findViewById(R.id.btnCancelBigC);
+        btnScanBarcode = (Button) findViewById(R.id.btnScanBigC);
+        imvBarcode = (ImageView) findViewById(R.id.imvBarcodeBigC);
 
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.imageview);
@@ -114,11 +92,10 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
         imv = (ImageView) dialog.findViewById(R.id.imv);
 
         btnSave.setOnClickListener(this);
-        edtDateOfBirth.setOnClickListener(this);
-        imvCGV.setOnClickListener(this);
+        imvBigC.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         btnScanBarcode.setOnClickListener(this);
-        imvCGV.setOnLongClickListener(new View.OnLongClickListener() {
+        imvBigC.setOnLongClickListener(new View.OnLongClickListener() {
 
             @Override
             public boolean onLongClick(View v) {
@@ -126,54 +103,50 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
                 return true;
             }
         });
-        db.collection("cgv").document(phoneNumber).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection("bigc").document(phoneNumber).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot doc = task.getResult();
                     if (doc != null) {
-                        setObject(doc.toObject(CGV.class));
+                        setObject(doc.toObject(BigC.class));
                     }
                 } else {
-                    Log.e(TAG, "lỗi get cgv card");
+                    Log.e(TAG, "lỗi get bigC card");
                 }
             }
         });
     }
 
-    public CGV toObject() {
-        CGV cgv = new CGV();
-        if (edtCMND.getText() != null) cgv.setIdNUmber(edtCMND.getText().toString());
-        if (edtName.getText() != null) cgv.setName(edtName.getText().toString());
-        if (myCalendar != null) cgv.setDateOfBirth(myCalendar.getTime());
-        if (edtNumberCGV.getText() != null) cgv.setNumberCGV(edtNumberCGV.getText().toString());
-        cgv.setUrl("https://firebasestorage.googleapis.com/v0/b/barcode-57c5e.appspot.com/o/cgv%2F" + phoneNumber + "?alt=media");
-        return cgv;
+    public BigC toObject() {
+        BigC bigC = new BigC();
+        if (edtName.getText() != null) bigC.setName(edtName.getText().toString());
+        if (edtNumberBigC.getText() != null) bigC.setNumberBigC(edtNumberBigC.getText().toString());
+        bigC.setUrl("https://firebasestorage.googleapis.com/v0/b/barcode-57c5e.appspot.com/o/bigc%2F" + phoneNumber + "?alt=media");
+        return bigC;
     }
 
-    public void setObject(CGV obj) {
+    public void setObject(BigC obj) {
         if (obj == null) return;
 
         String myFormat = "MM/dd/yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
-        edtCMND.setText(obj.getIdNUmber());
-        edtDateOfBirth.setText(sdf.format(obj.getDateOfBirth()));
         edtName.setText(obj.getName());
-        edtNumberCGV.setText(obj.getNumberCGV());
+        edtNumberBigC.setText(obj.getNumberBigC());
 
         if (obj.getUrl() != null) {
             Log.d(TAG, obj.getUrl());
             Glide.with(getContext())
                     .load(obj.getUrl())
-                    .into(imvCGV);
+                    .into(imvBigC);
             Glide.with(getContext())
                     .load(obj.getUrl())
                     .into(imv);
         }
-        if(obj.getNumberCGV() != null && !obj.getNumberCGV().equals("")){
+        if(obj.getNumberBigC() != null && !obj.getNumberBigC().equals("")){
             try {
-                imvBarcode.setImageBitmap(createBarcodeBitmap(obj.getNumberCGV(), 1080, 210, BarcodeFormat.CODE_128));
+                imvBarcode.setImageBitmap(createBarcodeBitmap(obj.getNumberBigC(), 1080, 210, BarcodeFormat.EAN_13));
             } catch (WriterException e) {
                 Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
             }
@@ -181,12 +154,9 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
     }
 
     public void disableView() {
-        edtCMND.setFocusable(false);
-        edtDateOfBirth.setFocusable(false);
         edtName.setFocusable(false);
-        edtNumberCGV.setFocusable(false);
-        edtDateOfBirth.setOnClickListener(null);
-        imvCGV.setOnClickListener(new View.OnClickListener() {
+        edtNumberBigC.setFocusable(false);
+        imvBigC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.show();
@@ -195,19 +165,18 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
     }
 
     public void setUri(Uri uri) {
-        imvCGV.setImageURI(uri);
+        imvBigC.setImageURI(uri);
         imv.setImageURI(uri);
     }
 
     public void setBytes(byte[] b) {
         bytes = b;
     }
-
     public void setCode(String code) {
-        if (code == null || code.equals("")) return;
-        edtNumberCGV.setText(code);
+        if(code == null || code.equals("")) return;
+        edtNumberBigC.setText(code);
         try {
-            imvBarcode.setImageBitmap(createBarcodeBitmap(code, 1080, 210, BarcodeFormat.CODE_128));
+            imvBarcode.setImageBitmap(createBarcodeBitmap(code, 1080, 210, BarcodeFormat.EAN_13));
         } catch (WriterException e) {
             Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
         }
@@ -216,49 +185,43 @@ public class DialogCGV extends Dialog implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnSaveCGV:
+            case R.id.btnSaveBigC:
                 if (bytes != null)
-                    storageRef.child("cgv").child(phoneNumber).putBytes(bytes);
-                db.collection("cgv").document(phoneNumber).set(toObject()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    storageRef.child("bigc").child(phoneNumber).putBytes(bytes);
+                db.collection("bigc").document(phoneNumber).set(toObject()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Util.toast(getContext(), "Cập nhật thẻ CGV thành công");
+                            Util.toast(getContext(), "Cập nhật thẻ bigC thành công");
                             dismiss();
                         } else {
-                            Log.d(TAG, "Error add cgv card: ", task.getException());
+                            Log.d(TAG, "Error add bigC card: ", task.getException());
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Util.toast(getContext(), "Cập nhật thẻ CGV thất bại");
+                        Util.toast(getContext(), "Cập nhật thẻ bigC thất bại");
                         Log.e(TAG, e.toString());
                     }
                 });
                 ;
                 dismiss();
-            case R.id.edtBirthday_dialog_cgv:
-                // if (type.equals("view")) break;
-                // TODO Auto-generated method stub
-                new DatePickerDialog(getContext(), date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-                break;
-            case R.id.imvCGV:
+            case R.id.imvBigC:
                 // start cropping activity for pre-acquired image saved on the device
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .start(activity);
                 break;
-            case R.id.btnCancelCgv:
+            case R.id.btnCancelBigC:
                 dismiss();
                 break;
-            case R.id.btnScanCgv:
+            case R.id.btnScanBigC:
                 //initiating the qr code scan
                 IntentIntegrator qrScan = new IntentIntegrator(activity);
+//                qrScan.setDesiredBarcodeFormats(IntentIntegrator.EAN_13);
                 qrScan.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-                qrScan.setPrompt("Quét mã vạch thẻ CGV");
+                qrScan.setPrompt("Quét mã vạch thẻ bigC");
                 qrScan.setOrientationLocked(false);
                 qrScan.setBeepEnabled(true);
                 qrScan.setCaptureActivity(CaptureActivityPortrait.class);

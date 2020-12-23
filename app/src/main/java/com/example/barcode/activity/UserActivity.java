@@ -58,6 +58,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.barcode.util.Util.createBarcodeBitmap;
+
 public class UserActivity extends AppCompatActivity implements View.OnClickListener {
     private Calendar myCalendar = Calendar.getInstance();
     private EditText edtBirthDay, edtName, edtAdress, edtPhoneNumber, edtCMND;
@@ -372,7 +374,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
 
         if (type.equals("view")) {
             try {
-                imgBarCode.setImageBitmap(createBarcodeBitmap(user.getId(), 1080, 210));
+                imgBarCode.setImageBitmap(createBarcodeBitmap(user.getId(), 1080, 210, BarcodeFormat.CODE_128));
             } catch (WriterException e) {
                 Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
             }
@@ -388,27 +390,5 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             btnSaveUser.setText("Sửa");
         }
     }
-
-    //tao ma barcode
-    private Bitmap createBarcodeBitmap(String data, int width, int height) throws WriterException {
-        MultiFormatWriter writer = new MultiFormatWriter();
-        String finalData = Uri.encode(data);
-
-        // Use 1 as the height of the matrix as this is a 1D Barcode.
-        BitMatrix bm = writer.encode(finalData, BarcodeFormat.CODE_128, width, 1);
-        int bmWidth = bm.getWidth();
-
-        Bitmap imageBitmap = Bitmap.createBitmap(bmWidth, height, Bitmap.Config.ARGB_8888);
-
-        for (int i = 0; i < bmWidth; i++) {
-            // Paint columns of width 1
-            int[] column = new int[height];
-            Arrays.fill(column, bm.get(i, 0) ? Color.BLACK : Color.WHITE);
-            imageBitmap.setPixels(column, 0, 1, i, 0, 1, height);
-        }
-
-        return imageBitmap;
-    }
-
 
 }

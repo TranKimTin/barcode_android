@@ -14,12 +14,13 @@ public class IdNumber implements Parcelable {
     private String region;
     private String adress2;
     private String gender;
+    private String barcode;
     private String url;
 
     public IdNumber() {
     }
 
-    public IdNumber(String idNUmber, String name, Date dateOfBirth, Date startDate, String adress, String region, String adress2, String gender, String url) {
+    public IdNumber(String idNUmber, String name, Date dateOfBirth, Date startDate, String adress, String region, String adress2, String gender, String barcode, String url) {
         this.idNUmber = idNUmber;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
@@ -28,7 +29,16 @@ public class IdNumber implements Parcelable {
         this.region = region;
         this.adress2 = adress2;
         this.gender = gender;
+        this.barcode = barcode;
         this.url = url;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     public String getUrl() {
@@ -112,6 +122,7 @@ public class IdNumber implements Parcelable {
         this.gender = in.readString();
         this.dateOfBirth = new Date(in.readLong());
         this.startDate = new Date(in.readLong());
+        this.barcode = in.readString();
         this.url = in.readString();
     }
 
@@ -125,6 +136,7 @@ public class IdNumber implements Parcelable {
         parcel.writeString(gender);
         parcel.writeLong(this.dateOfBirth.getTime());
         parcel.writeLong(this.startDate.getTime());
+        parcel.writeString(barcode);
         parcel.writeString(url);
     }
 

@@ -22,6 +22,15 @@ import com.bumptech.glide.Glide;
 import com.example.barcode.R;
 import com.example.barcode.object.DriverLicense;
 import com.example.barcode.object.IdNumber;
+import com.example.barcode.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -30,7 +39,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class DialogDriverLicense extends Dialog implements View.OnClickListener {
-    private Button btnSave;
+    private Button btnSave, btnCancel;
     private EditText edtNumberDriverLicense, edtName, edtDateOfBirth, edtAdress, edtStartDate, edtAdress2, edtContry;
     private DatePickerDialog.OnDateSetListener date;
     private Calendar myCalendar = Calendar.getInstance();
@@ -42,6 +51,9 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
     private Dialog dialog;
     private ImageView imv;
     private byte bytes[];
+    private StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String phoneNumber = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+84","0");
 
     public DialogDriverLicense(@NonNull Context context, Activity activity) {
         super(context);
@@ -99,6 +111,7 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
         edtName = (EditText) findViewById(R.id.edtName_dialog_driver_license);
         edtStartDate = (EditText) findViewById(R.id.edtStartDate_dialog_driver_license);
         imvDriverLicense = (ImageView) findViewById(R.id.imvDriverLicense);
+        btnCancel = (Button) findViewById(R.id.btnCancelDriverLicense);
 
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.imageview);
@@ -113,6 +126,28 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
         edtDateOfBirth.setOnClickListener(this);
         edtStartDate.setOnClickListener(this);
         imvDriverLicense.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+        imvDriverLicense.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                dialog.show();
+                return true;
+            }
+        });
+        db.collection("driver_license").document(phoneNumber).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc != null){
+                        setObject(doc.toObject(DriverLicense.class));
+                    }
+                }else{
+                    Log.e(TAG, "lỗi get driver license");
+                }
+            }
+        });
     }
 
     public DriverLicense toObject() {
@@ -125,6 +160,7 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
         if (edtAdress.getText() != null) driverLicense.setAdress(edtAdress.getText().toString());
         if (edtAdress2.getText() != null) driverLicense.setAdress2(edtAdress2.getText().toString());
         if (edtContry.getText() != null) driverLicense.setContry(edtContry.getText().toString());
+        driverLicense.setUrl("https://firebasestorage.googleapis.com/v0/b/barcode-57c5e.appspot.com/o/driver_license%2F" + phoneNumber + "?alt=media");
 
         return driverLicense;
     }
@@ -184,6 +220,24 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSaveDriverLicense:
+                if (bytes != null) storageRef.child("driver_license").child(phoneNumber).putBytes(bytes);
+                db.collection("driver_license").document(phoneNumber).set(toObject()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Util.toast(getContext(), "Cập nhật bằng lái xe thành công");
+                            dismiss();
+                        } else {
+                            Log.d(TAG, "Error add driver license: ", task.getException());
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Util.toast(getContext(), "Cập nhật bằng lái xe thất bại");
+                        Log.e(TAG, e.toString());
+                    }
+                });;
                 dismiss();
                 break;
             case R.id.edtBirthday_dialog_driver_license:
@@ -205,6 +259,9 @@ public class DialogDriverLicense extends Dialog implements View.OnClickListener 
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .start(activity);
+                break;
+            case R.id.btnCancelDriverLicense:
+                dismiss();
                 break;
         }
     }

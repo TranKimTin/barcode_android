@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -20,17 +24,35 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.example.barcode.R;
+import com.example.barcode.activity.CaptureActivityPortrait;
 import com.example.barcode.object.IdNumber;
 import com.example.barcode.object.StudentCard;
+import com.example.barcode.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static com.example.barcode.util.Util.createBarcodeBitmap;
+
 public class DialogStudentCard extends Dialog implements View.OnClickListener {
-    private Button btnSave;
+    private Button btnSave, btnCancel, btnScanBarcode;
     private EditText edtStudentCode, edtName, edtDateOfBirth, edtMajor, edtClass, edtEndtDate;
     private Spinner spGender;
     private DatePickerDialog.OnDateSetListener date;
@@ -43,6 +65,10 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
     private Dialog dialog;
     private ImageView imv;
     private byte bytes[];
+    private StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String phoneNumber = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+84", "0");
+    private ImageView imvBarcode;
 
     public DialogStudentCard(@NonNull Context context, Activity activity) {
         super(context);
@@ -100,6 +126,9 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
         edtEndtDate = (EditText) findViewById(R.id.edtEndDate_dialog_student_card);
         edtStudentCode = (EditText) findViewById(R.id.edtStudentCode_dialog_student_card);
         imvStudentCard = (ImageView) findViewById(R.id.imvStudentCard);
+        btnCancel = (Button) findViewById(R.id.btnCancel_dialog_student_card);
+        btnScanBarcode = (Button) findViewById(R.id.btnScanStudentBarcode);
+        imvBarcode = (ImageView) findViewById(R.id.imgBarCodeStudentCard);
 
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.imageview);
@@ -120,6 +149,30 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
         edtDateOfBirth.setOnClickListener(this);
         edtEndtDate.setOnClickListener(this);
         imvStudentCard.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+        btnScanBarcode.setOnClickListener(this);
+        imvStudentCard.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                dialog.show();
+                return true;
+            }
+        });
+        db.collection("student_card").document(phoneNumber).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    if (doc != null) {
+                        setObject(doc.toObject(StudentCard.class));
+                    }
+                } else {
+                    Log.e(TAG, "lỗi get student card");
+                }
+            }
+        });
+
     }
 
     public StudentCard toObject() {
@@ -133,6 +186,7 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
         if (edtClass.getText() != null) studentCard.setClasses(edtClass.getText().toString());
         if (spGender.getSelectedItem() != null)
             studentCard.setGender(spGender.getSelectedItem().toString());
+        studentCard.setUrl("https://firebasestorage.googleapis.com/v0/b/barcode-57c5e.appspot.com/o/student_card%2F" + phoneNumber + "?alt=media");
         return studentCard;
     }
 
@@ -159,6 +213,13 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
             Glide.with(getContext())
                     .load(obj.getUrl())
                     .into(imv);
+        }
+        if(obj.getStudentCode() != null && !obj.getStudentCode().equals("")){
+            try {
+                imvBarcode.setImageBitmap(createBarcodeBitmap(obj.getStudentCode(), 1080, 210, BarcodeFormat.CODE_128));
+            } catch (WriterException e) {
+                Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
+            }
         }
     }
 
@@ -189,10 +250,40 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
         bytes = b;
     }
 
+    public void setCode(String code) {
+        if(code == null || code.equals("")) return;
+        edtStudentCode.setText(code);
+        try {
+            imvBarcode.setImageBitmap(createBarcodeBitmap(code, 1080, 210, BarcodeFormat.CODE_128));
+        } catch (WriterException e) {
+            Util.logE("Lỗi tạo mã " + e.getLocalizedMessage());
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSaveStudentCard:
+                if (bytes != null)
+                    storageRef.child("student_card").child(phoneNumber).putBytes(bytes);
+                db.collection("student_card").document(phoneNumber).set(toObject()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Util.toast(getContext(), "Cập nhật thẻ sinh viên thành công");
+                            dismiss();
+                        } else {
+                            Log.d(TAG, "Error add student card: ", task.getException());
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Util.toast(getContext(), "Cập nhật thẻ sinh viên thất bại");
+                        Log.e(TAG, e.toString());
+                    }
+                });
+                ;
                 dismiss();
                 break;
             case R.id.edtBirthday_dialog_student_card:
@@ -214,6 +305,19 @@ public class DialogStudentCard extends Dialog implements View.OnClickListener {
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .start(activity);
+                break;
+            case R.id.btnCancel_dialog_student_card:
+                dismiss();
+                break;
+            case R.id.btnScanStudentBarcode:
+                //initiating the qr code scan
+                IntentIntegrator qrScan = new IntentIntegrator(activity);
+                qrScan.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+                qrScan.setPrompt("Quét mã vạch thẻ sinh viên");
+                qrScan.setOrientationLocked(false);
+                qrScan.setBeepEnabled(true);
+                qrScan.setCaptureActivity(CaptureActivityPortrait.class);
+                qrScan.initiateScan();
                 break;
         }
     }

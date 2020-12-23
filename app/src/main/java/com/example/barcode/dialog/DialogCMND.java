@@ -1,6 +1,7 @@
 package com.example.barcode.dialog;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.barcode.R;
+import com.example.barcode.activity.CaptureActivityPortrait;
 import com.example.barcode.object.IdNumber;
 import com.example.barcode.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,6 +33,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -40,8 +45,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static com.example.barcode.util.Util.createBarcodeBitmap;
+import static com.example.barcode.util.Util.encodeAsBitmap;
+
 public class DialogCMND extends Dialog implements View.OnClickListener {
-    private Button btnSave, btnCancel;
+    private Button btnSave, btnScanBarcode, btnCancel;
     private EditText edtCMND, edtName, edtDateOfBirth, edtAdress, edtRegion, edtStartDate, edtAdress2;
     private Spinner spGender;
     private DatePickerDialog.OnDateSetListener date;
@@ -54,9 +62,11 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
     private Dialog dialog;
     private ImageView imv;
     private byte bytes[];
-    private StorageReference storageRef;
+    private ImageView imvBarcode;
+    private StorageReference storageRef = FirebaseStorage.getInstance().getReference();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String phoneNumber = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+84","0");
+    private String phoneNumber = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+84", "0");
+    private String code_scan;
 
     public DialogCMND(@NonNull Context context, Activity activity) {
         super(context);
@@ -73,7 +83,6 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
 
         getWindow().setLayout(width, height);
 
-        storageRef = FirebaseStorage.getInstance().getReference();
         setView();
         date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -117,6 +126,8 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
         edtStartDate = (EditText) findViewById(R.id.edtStartDate_dialog_cmnd);
         imvCMND = (ImageView) findViewById(R.id.imvCMND);
         btnCancel = (Button) findViewById(R.id.btnCancel_dialog_cmnd);
+        btnScanBarcode = (Button) findViewById(R.id.btnScanCmnd);
+        imvBarcode = (ImageView) findViewById(R.id.imvBarcodeCMND);
 
         dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.imageview);
@@ -138,6 +149,7 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
         edtStartDate.setOnClickListener(this);
         imvCMND.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+        btnScanBarcode.setOnClickListener(this);
         imvCMND.setOnLongClickListener(new View.OnLongClickListener() {
 
             @Override
@@ -149,12 +161,12 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
         db.collection("cmnd").document(phoneNumber).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     DocumentSnapshot doc = task.getResult();
-                    if(doc != null){
+                    if (doc != null) {
                         setObject(doc.toObject(IdNumber.class));
                     }
-                }else{
+                } else {
                     Log.e(TAG, "lỗi get cmnd");
                 }
             }
@@ -172,6 +184,7 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
         if (edtRegion.getText() != null) cmnd.setRegion(edtRegion.getText().toString());
         if (spGender.getSelectedItem() != null)
             cmnd.setGender(spGender.getSelectedItem().toString());
+        if(code_scan != null) cmnd.setBarcode(code_scan);
         cmnd.setUrl("https://firebasestorage.googleapis.com/v0/b/barcode-57c5e.appspot.com/o/cmnd%2F" + phoneNumber + "?alt=media");
         return cmnd;
     }
@@ -200,6 +213,14 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
             Glide.with(getContext())
                     .load(obj.getUrl())
                     .into(imv);
+        }
+        code_scan = obj.getBarcode();
+        if(code_scan != null && !code_scan.trim().equals("")){
+            try {
+                imvBarcode.setImageBitmap(encodeAsBitmap(code_scan, BarcodeFormat.PDF_417, 1080, 210));
+            } catch (WriterException e) {
+                Log.e(TAG, "Lỗi tạo mã cmnd");
+            }
         }
     }
 
@@ -236,6 +257,16 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
     public void setBytes(byte[] b) {
         bytes = b;
     }
+    public void setCode(String code) {
+        if (code == null || code.equals("")) return;
+        code_scan = code;
+        try {
+            imvBarcode.setImageBitmap(encodeAsBitmap(code, BarcodeFormat.PDF_417, 1080, 210));
+            Log.d(TAG, code);
+        } catch (WriterException e) {
+            Log.e(TAG, "Lỗi tạo mã cmnd");
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -255,10 +286,11 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Util.toast(getContext(), "Update user thất bại");
+                        Util.toast(getContext(), "Cập nhật CMND thất bại");
                         Log.e(TAG, e.toString());
                     }
-                });;
+                });
+                ;
                 dismiss();
                 break;
             case R.id.edtBirthday_dialog_cmnd:
@@ -281,8 +313,19 @@ public class DialogCMND extends Dialog implements View.OnClickListener {
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .start(activity);
                 break;
-            case R.id.btnCancel:
+            case R.id.btnCancel_dialog_cmnd:
                 dismiss();
+                break;
+            case R.id.btnScanCmnd:
+                //initiating the qr code scan
+                IntentIntegrator qrScan = new IntentIntegrator(activity);
+//                qrScan.setDesiredBarcodeFormats(IntentIntegrator.EAN_13);
+                qrScan.setDesiredBarcodeFormats(IntentIntegrator.PDF_417);
+                qrScan.setPrompt("Quét mã vạch CMND");
+                qrScan.setOrientationLocked(false);
+                qrScan.setBeepEnabled(true);
+                qrScan.setCaptureActivity(CaptureActivityPortrait.class);
+                qrScan.initiateScan();
                 break;
         }
     }

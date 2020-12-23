@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout
+        <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -14,13 +12,13 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:src="@drawable/icon_plus"
-            android:id="@+id/imvCGV"
+            android:id="@+id/imvBigC"
             android:padding="10dp"
             />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/imvBarcodeCgv" />
+            android:id="@+id/imvBarcodeBigC" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,32 +28,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Mã thẻ CGV: "/>
+                android:text="Mã thẻ BigC: "/>
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
-                android:id="@+id/edtNumber_cgv"
-                android:inputType="phone"
-                android:digits="0123456789" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="10">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Số CMND: "/>
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:id="@+id/edtCMND_dialog_cgv"
+                android:id="@+id/edtNumber_BigC"
                 android:inputType="phone"
                 android:digits="0123456789" />
         </LinearLayout>
@@ -66,6 +45,7 @@
             android:orientation="horizontal"
             android:weightSum="10">
             <TextView
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -75,33 +55,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
-                android:id="@+id/edtName_dialog_cgv"/>
+                android:id="@+id/edtName_dialog_bigC"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="10">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Ngày sinh: "/>
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/edtBirthday_dialog_cgv"
-                android:clickable="true"
-                android:hint="dd/mm/yyyy"
-                android:focusable="false"
-                android:layout_weight="10"/>
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -113,9 +71,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
 
-                android:id="@+id/btnCancelCgv"
-                />
-
+                android:id="@+id/btnCancelBigC"
+               />
             <Button
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="15dp"
@@ -124,7 +81,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
 
-                android:id="@+id/btnScanCgv"
+                android:id="@+id/btnScanBigC"
               />
 
             <Button
@@ -135,8 +92,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
 
-                android:id="@+id/btnSaveCGV"
-             />
+                android:id="@+id/btnSaveBigC"
+               />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

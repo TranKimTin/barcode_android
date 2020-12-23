@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Util.toast(this, "Không phát hiện mã");
             } else {
                 String id = result.getContents();
+                Util.toast(getApplicationContext(), id);
                 db.collection("user").whereEqualTo("id", id).limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
